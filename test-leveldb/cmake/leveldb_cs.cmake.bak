@@ -1,0 +1,34 @@
+message("[leveldb_cs.cmake] start")
+
+# protoc & grpc_cpp_plugin
+find_file(_PROTOBUF_PROTOC protoc $ENV{HOME}/.local/${PROTOC_DIR}/bin)
+find_file(_GRPC_CPP_PLUGIN_EXECUTABLE grpc_cpp_plugin $ENV{HOME}/.local/grpc/bin)
+
+set(PROTOC_NAME "leveldb_cs")
+
+# Proto file
+get_filename_component(${PROTOC_NAME}_proto "${PROJECT_SOURCE_DIR}/protos/${PROTOC_NAME}.proto" ABSOLUTE)
+get_filename_component(${PROTOC_NAME}_proto_path "${${PROTOC_NAME}_proto}" PATH)
+
+# Generated sources
+
+set(${PROTOC_NAME}_proto_srcs "${PROJECT_SOURCE_DIR}/protos/${PROTOC_NAME}.pb.cc")
+set(${PROTOC_NAME}_proto_hdrs "${PROJECT_SOURCE_DIR}/protos/${PROTOC_NAME}.pb.h")
+set(${PROTOC_NAME}_grpc_srcs "${PROJECT_SOURCE_DIR}/protos/${PROTOC_NAME}.grpc.pb.cc")
+set(${PROTOC_NAME}_grpc_hdrs "${PROJECT_SOURCE_DIR}/protos/${PROTOC_NAME}.grpc.pb.h")
+message(STATUS ${${PROTOC_NAME}_proto_srcs})
+
+add_custom_command(
+        OUTPUT "${${PROTOC_NAME}_proto_srcs}" "${${PROTOC_NAME}_proto_hdrs}" "${${PROTOC_NAME}_grpc_srcs}" "${${PROTOC_NAME}_grpc_hdrs}"
+        COMMAND ${_PROTOBUF_PROTOC}
+        ARGS
+        --grpc_out "${PROJECT_SOURCE_DIR}/protos"
+        --cpp_out "${PROJECT_SOURCE_DIR}/protos"
+        -I "${${PROTOC_NAME}_proto_path}"
+        --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
+        "${${PROTOC_NAME}_proto}"
+        DEPENDS "${${PROTOC_NAME}_proto}"
+)
+message(STATUS "${${PROTOC_NAME}_proto}")
+
+message("[leveldb_cs.cmake] end")

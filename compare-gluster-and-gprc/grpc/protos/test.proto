@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package test;
+
+service Test {
+    rpc SetStringLength (LengthRequest) returns (LengthReply) {
+    }
+    rpc Seek (SeekRequest) returns (SeekReply) {
+    }
+    rpc Write (WriteRequest) returns (WriteReply) {
+    }
+    rpc Read (ReadRequest) returns (ReadReply) {
+    }
+}
+
+message LengthRequest {
+    int32 len = 1;
+}
+
+message LengthReply {
+    int32 rc = 1;
+}
+
+message SeekRequest {
+    int64 offset = 1;
+}
+
+message SeekReply {
+    int32 rc = 1;
+}
+
+message WriteRequest {
+    bytes content = 1;
+}
+
+message WriteReply {
+    int32 rc = 1;
+}
+
+message ReadRequest {
+    int32 index = 1;
+}
+
+message ReadReply {
+    bytes content = 1;
+    int32 rc = 2;
+}
