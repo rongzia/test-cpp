@@ -20,42 +20,48 @@ namespace logger {
         FATAL
     };
 
-    enum class LogType{
+    enum class LogType {
         NORMAL,
-        SIMPLE
+        SIMPLE,
+        FUNC
     };
 
     class Logger {
 
     public:
-        Logger();
+        Logger() = delete;
+
+        Logger(LogType logType);
 
         ~Logger();
 
-        static void Open();
-
-        static std::ostream &Log(LogRank log_rank, const int line, const std::string &function, const std::string &file);
+        static std::ostream &Log(LogRank log_rank, const int line,
+                                 const std::string &function, const std::string &file);
 
         static std::ostream &LogSimple();
 
-        static std::string path_;
-        static std::string path_simple_;
+        static std::ostream &LogFunc();
 
+
+        static std::string path_;
     private:
-//        static void Open();
+        static void Open();
+
         static std::ostream &GetStream();
 
-        static std::ofstream log_file_;
         static LogType logType_;
+        static std::ofstream log_file_;
     };
 
     void set_path(const std::string path);
 }
 
 #define LOG(log_rank) \
-logger::Logger().Log(log_rank, __LINE__,__FUNCTION__,__FILE__)
+logger::Logger(logger::LogType::NORMAL).Log(log_rank, __LINE__,__FUNCTION__,__FILE__)
 
 #define LOG_SIMPLE \
-logger::Logger().LogSimple()
+logger::Logger(logger::LogType::SIMPLE).LogSimple()
 
+#define  LOG_FUNC \
+logger::Logger(logger::LogType::FUNC).LogFunc()
 #endif //TEST_LOGGER_H

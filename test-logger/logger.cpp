@@ -5,7 +5,7 @@
 #include "logger.h"
 #include <iostream>
 
- #define DEBUG_FLAG
+#define DEBUG_FLAG
 
 namespace logger {
 
@@ -19,58 +19,73 @@ namespace logger {
 
     std::ofstream Logger::log_file_;
     std::string Logger::path_;
-    std::string Logger::path_simple_;
     LogType Logger::logType_;
 
-    void set_path(const std::string path) {
-        Logger::path_ = path;
-        Logger::path_simple_ = path + "_SAMPLE";
-    }
-
-    void Logger::Open() {
-        if (!log_file_.is_open()) {
-            log_file_.open(LogType::SIMPLE == logType_ ? path_simple_: path_, std::ios::app);
-        }
-    }
-
-    std::ostream &Logger::GetStream() {
+    Logger::Logger(LogType logType) {
+        logType_ = logType;
         if ("" == path_) {
             if (nullptr == getenv("MYSQL_DATA_PATH")) {
-                path_ = std::string(getenv("HOME")) + "/LOG";
-                path_simple_ = std::string(getenv("HOME")) + "/LOG_SAMPLE";
+                path_ = std::string(getenv("HOME"));
             } else {
-                path_ = std::string(getenv("MYSQL_DATA_PATH")) + "/LOG";
-                path_simple_ = std::string(getenv("MYSQL_DATA_PATH")) + "/LOG_SAMPLE";
+                path_ = std::string(getenv("MYSQL_DATA_PATH"));
             }
         }
+        switch (logType_) {
+            case LogType::NORMAL :
+                path_ += "/LOG";
+                break;
+            case LogType::SIMPLE :
+                path_ += "/LOG_SIMPLE";
+                break;
+            case LogType::FUNC :
+                path_ += "/LOG_FUNC";
+                break;
+            default:
+                path_ += "/LOG";
+        }
 
-        Open();
 #ifdef DEBUG_FLAG
-            std::cout << "LOG file opend in : " << (LogType::SIMPLE == logType_ ? path_simple_: path_) << std::endl;
-#endif
-        return log_file_.is_open() ? log_file_ : std::cout;
-    }
-
-    std::ostream &Logger::Log(LogRank log_rank, const int line, const std::string &function, const std::string &file) {
-        logType_ = LogType::NORMAL;
-        return GetStream() << "[" << getTime() << ", line " << line << ", " << function << "()] ";
-    }
-
-    std::ostream &Logger::LogSimple(){
-        logType_ = LogType::SIMPLE;
-        return GetStream();
-    }
-
-    Logger::Logger() {
-#ifdef DEBUG_FLAG
-        std::cout << "Logger(). ";
+        std::cout << "Logger(). type:" << (int) logType << std::endl;
         std::cout << (path_ == "" ? "has not set path." : "log file path : " + path_) << std::endl;
 #endif
     }
 
+    void set_path(const std::string path) {
+        Logger::path_ = path;
+    }
+
+    void Logger::Open() {
+        if (!log_file_.is_open() && "" != path_) {
+            log_file_.open(path_, std::ios::app);
+#ifdef DEBUG_FLAG
+            std::cout << "LOG file opend in : " << path_ << std::endl;
+#endif
+        }
+    }
+
+    std::ostream &Logger::GetStream() {
+        Open();
+        return log_file_.is_open() ? log_file_ : std::cout;
+    }
+
+    std::ostream &Logger::Log(LogRank log_rank, const int line, const std::string &function, const std::string &file) {
+        return GetStream() << "[" << getTime() << ", line " << line << ", " << function << "()] ";
+    }
+
+    std::ostream &Logger::LogSimple() {
+        return GetStream();
+    }
+
+    std::ostream &Logger::LogFunc() {
+        return GetStream();
+    }
+
     Logger::~Logger() {
         GetStream() << std::endl; // << std::flush;
-        log_file_.close();
+        if (log_file_.is_open()) {
+            log_file_.close();
+        }
+        path_ = "";
 #ifdef DEBUG_FLAG
         std::cout << "~Logger(). file " << path_ << " closed." << std::endl;
 #endif

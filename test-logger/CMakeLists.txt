@@ -1,1 +1,1 @@
-add_executable(test_logger test_logger.cpp logger.cpp ../tempfile.cpp)
+add_executable(test_logger test_logger.cpp logger.cpp ../test-other-logger/logger.h)
