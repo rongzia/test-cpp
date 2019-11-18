@@ -1,0 +1,13 @@
+Log file created at: 2019/11/10 17:18:22
+Running on machine: rrzhang-PC
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I1110 17:18:22.485564 10380 test_glog.cpp:20]  opened
+I1110 17:18:22.485687 10380 test_glog.cpp:20]  opened
+I1110 17:18:22.485690 10380 test_glog.cpp:20]  opened
+I1110 17:18:22.485693 10380 test_glog.cpp:20]  opened
+I1110 17:18:22.485695 10380 test_glog.cpp:20]  opened
+I1110 17:18:22.485697 10380 test_glog.cpp:20]  opened
+I1110 17:18:22.485699 10380 test_glog.cpp:20]  opened
+I1110 17:18:22.485702 10380 test_glog.cpp:20]  opened
+I1110 17:18:22.485703 10380 test_glog.cpp:20]  opened
+I1110 17:18:22.485705 10380 test_glog.cpp:20]  opened

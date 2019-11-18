@@ -1,0 +1,1 @@
+add_executable(test_namespace test_namespace.cpp)
