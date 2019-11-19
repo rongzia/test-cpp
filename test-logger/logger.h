@@ -1,67 +1,58 @@
 //
-// Created by rrzhang on 2019/11/11.
+// Created by rrzhang on 2019/11/18.
 //
 
 #ifndef TEST_LOGGER_H
 #define TEST_LOGGER_H
 
-
 #include <ostream>
 #include <fstream>
+#include <iostream>
 
-namespace logger {
+//#define DEBUG_FLAG
 
-    std::string getTime();
+enum class LogRank {
+    INFO,
+    WARNING,
+    ERROR,
+    FATAL
+};
 
-    enum class LogRank {
-        INFO,
-        WARNING,
-        ERROR,
-        FATAL
-    };
+enum class LogType {
+    NORMAL,
+    SIMPLE,
+    FUNC
+};
 
-    enum class LogType {
-        NORMAL,
-        SIMPLE,
-        FUNC
-    };
+std::ostream &Log(LogType logType, const int line, const std::string &function, const std::string &file);
 
-    class Logger {
+std::ostream &LogSimple(LogType logType) ;
 
-    public:
-        Logger() = delete;
+std::ostream &LogFunc(LogType logType);
 
-        Logger(LogType logType);
+std::ostream &sysLog(LogType logType, const int line, const std::string &function, const std::string &file);
 
-        ~Logger();
+std::ostream &sysLogSimple(LogType logType) ;
 
-        static std::ostream &Log(LogRank log_rank, const int line,
-                                 const std::string &function, const std::string &file);
+std::ostream &sysLogFunc(LogType logType);
 
-        static std::ostream &LogSimple();
-
-        static std::ostream &LogFunc();
-
-
-        static std::string path_;
-    private:
-        static void Open();
-
-        static std::ostream &GetStream();
-
-        static LogType logType_;
-        static std::ofstream log_file_;
-    };
-
-    void set_path(const std::string path);
-}
-
-#define LOG(log_rank) \
-logger::Logger(logger::LogType::NORMAL).Log(log_rank, __LINE__,__FUNCTION__,__FILE__)
+#define LOG \
+Log(LogType::NORMAL, __LINE__,__FUNCTION__,__FILE__)
 
 #define LOG_SIMPLE \
-logger::Logger(logger::LogType::SIMPLE).LogSimple()
+LogSimple(LogType::SIMPLE)
 
 #define  LOG_FUNC \
-logger::Logger(logger::LogType::FUNC).LogFunc()
+LogFunc(LogType::FUNC)
+
+#define SYS_LOG \
+sysLog(LogType::NORMAL, __LINE__,__FUNCTION__,__FILE__)
+
+#define SYS_LOG_SIMPLE \
+sysLogSimple(LogType::SIMPLE)
+
+#define  SYS_LOG_FUNC \
+sysLogFunc(LogType::FUNC)
+
+
 #endif //TEST_LOGGER_H

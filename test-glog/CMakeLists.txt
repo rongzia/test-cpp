@@ -20,6 +20,6 @@ INCLUDE_DIRECTORIES(/home/rrzhang/.local/gflags-2.2.0/include)
 LINK_LIBRARIES(pthread)
 LINK_LIBRARIES(/home/rrzhang/.local/glog-0.4.0/lib/libglog.a)
 LINK_LIBRARIES(/home/rrzhang/.local/gflags-2.2.0/lib/libgflags.a)
-add_executable(test_glog test_glog.cpp ../test-logger/logger.cpp ../test-logger/logger.h ../test-logger/test_logger.cpp)
+add_executable(test_glog test_glog.cpp)
 
 
