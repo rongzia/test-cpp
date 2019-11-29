@@ -36,7 +36,7 @@ std::ostream &sysLogSimple(LogType logType) ;
 
 std::ostream &sysLogFunc(LogType logType);
 
-#define LOG \
+#define LOG_NORMAL \
 Log(LogType::NORMAL, __LINE__,__FUNCTION__,__FILE__)
 
 #define LOG_SIMPLE \
@@ -45,7 +45,7 @@ LogSimple(LogType::SIMPLE)
 #define  LOG_FUNC \
 LogFunc(LogType::FUNC)
 
-#define SYS_LOG \
+#define SYS_LOG_NORMAL \
 sysLog(LogType::NORMAL, __LINE__,__FUNCTION__,__FILE__)
 
 #define SYS_LOG_SIMPLE \

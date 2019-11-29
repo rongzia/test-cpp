@@ -34,11 +34,12 @@ void init(LogType logType) {
         log_file_.close();
     }
     if ("" == path_) {
-        if (nullptr == getenv("MYSQL_DATA_PATH")) {
-            path_ = std::string(getenv("HOME"));
-        } else {
-            path_ = std::string(getenv("MYSQL_DATA_PATH"));
-        }
+//        if (nullptr == getenv("MYSQL_DATA_PATH")) {
+//            path_ = std::string(getenv("HOME"));
+//        } else {
+//            path_ = std::string(getenv("MYSQL_DATA_PATH"));
+//        }
+        path_ = std::string(getenv("HOME"));
     }
     switch (logType_) {
         case LogType::NORMAL :
