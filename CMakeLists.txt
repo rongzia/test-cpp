@@ -2,9 +2,11 @@ cmake_minimum_required(VERSION 3.14)
 project(test C CXX)
 message(STATUS "PROJECT_NAME : " ${PROJECT_NAME})
 
-#add_subdirectory(test-libevent)
+
 #add_subdirectory(test-grpc)
 #add_subdirectory(test-sizeOfStruct)
 #add_subdirectory(test-logger-withclass)
 #add_subdirectory(test-logger)
-add_subdirectory(test-spdlog)
+#add_subdirectory(test-spdlog)
+add_subdirectory(test-libevent)
+#add_subdirectory(test-socket)

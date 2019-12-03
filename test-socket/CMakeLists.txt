@@ -9,12 +9,12 @@ include_directories(include)
 
 
 link_directories(lib/static)
-add_executable(client src/client.cpp)
-add_executable(server src/server.cpp)
-target_link_libraries(client
+add_executable(client_socket src/client.cpp)
+add_executable(server_socket src/server.cpp)
+target_link_libraries(client_socket
         PerformanceOnetime
         )
-target_link_libraries(server
+target_link_libraries(server_socket
         PerformanceOnetime
         pthread
         )

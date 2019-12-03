@@ -48,6 +48,8 @@ int main()
     Profiler profiler;
 
     profiler.Start();
+
+    #define FUN_2 1
 #ifdef FUN_1
 #define WRITE_CLIENT_TIME_1 "ClientWriteTime1"
 #define WRITE_CLIENT_TIME_2 "ClientWriteTime2"
