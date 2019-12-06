@@ -1,7 +1,7 @@
-./**
+/**
  * Created by rrzhang on 2019/12/3.
  */
-
+#include <cstring>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -10,8 +10,8 @@
 #include <unistd.h>
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <iostream>
 
 #include <event.h>
 #include <event2/bufferevent.h>
@@ -63,15 +63,15 @@ int main(int argc, char **argv) {
 
 void cmd_msg_cb(int fd, short events, void *arg) {
     char msg[1024];
-
     int ret = read(fd, msg, sizeof(msg));
     if (ret < 0) {
         perror("read fail.\n");
         exit(1);
     }
 
+    std::string str("hello");
     bufferevent *bev = (bufferevent *)arg;
-    bufferevent_write(bev, msg, ret);
+    bufferevent_write(bev, str.data(), str.length());
 }
 
 void server_msg_cb(bufferevent *bev, void *arg) {

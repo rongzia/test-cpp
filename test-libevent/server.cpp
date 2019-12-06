@@ -49,7 +49,7 @@ int main() {
 void listener_cb(evconnlistener *listener, evutil_socket_t fd,
                  struct sockaddr *sock, int socklen, void *arg) {
     std::cout << "client connected fd : " << fd << std::endl;
-     event_base *base = (event_base *) arg;
+    event_base *base = (event_base *) arg;
 
     //下面代码是为这个fd创建一个bufferevent
     bufferevent *bev = bufferevent_socket_new(base, fd, BEV_OPT_CLOSE_ON_FREE);
@@ -61,20 +61,24 @@ void listener_cb(evconnlistener *listener, evutil_socket_t fd,
 
 void read_cb(bufferevent *bev, void *arg) {
     char msg[5];
+    std::cout << "evbuffer length : " << evbuffer_get_length(bufferevent_get_input(bev)) << std::endl;
     int len = bufferevent_read(bev, msg, sizeof(msg));
     std::cout << "read the data : " << msg << std::endl;
 
     std::string reply("reply");
     bufferevent_write(bev, reply.data(), reply.length());
-//    std::cout << "reply : " << reply << std::endl;
+    std::cout << "reply : " << reply << std::endl;
 }
 
 void error_cb(bufferevent *bev, short events, void *arg) {
-    if (events & BEV_EVENT_EOF)
+    if (events & BEV_EVENT_CONNECTED) {
+        std::cout << "client conneted." << std::endl;
+        return;
+    } else if (events & BEV_EVENT_EOF) {
         std::cout << "connection closed" << std::endl;
-    else if (events & BEV_EVENT_ERROR)
+    } else if (events & BEV_EVENT_ERROR) {
         std::cout << "some other error" << std::endl;
-
-    // 这将自动close套接字和free读写缓冲区
+    }
+    // 这将自动 close 套接字和 free 读写缓冲区
     bufferevent_free(bev);
 }

@@ -1,6 +1,7 @@
 #include <cstring>
 #include <iostream>
 #include <unistd.h>
+#include <thread>
 
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -8,13 +9,15 @@
 #include <event2/event.h>
 #include <event2/bufferevent.h>
 
-void write_fun(int fd, short events, void *arg) {
+void write_fun(int socket_fd, short events, void *arg) {
     bufferevent *bev = (bufferevent *) arg;
+    std::cout << "connect id : " << bufferevent_getfd(bev) << std::endl;
 
-    std::string msg("hello");
-    int len = bufferevent_write(bev, msg.data(), msg.length());
-//    ssize_t len = write(bufferevent_getfd(bev), msg.data(), msg.length());        // 同上，都是写入
-//    std::cout << "client write the data : " << msg << std::endl;
+    for (int i = 0; i < 10; i++) {
+        std::string msg(std::to_string(i));
+        bufferevent_write(bev, msg.data(), msg.length());
+        std::cout << msg << std::endl;
+    }
 }
 
 void read_cb(bufferevent *bev, void *arg) {
@@ -25,63 +28,52 @@ void read_cb(bufferevent *bev, void *arg) {
 }
 
 void error_cb(bufferevent *bev, short events, void *arg) {
-    std::cout << "error_cb :";
-    if (events & BEV_EVENT_EOF) {
+    std::cout << "error_cb : ";
+    if (events & BEV_EVENT_CONNECTED) {
+        std::cout << "connect to server" << std::endl;
+        return;
+    } else if (events & BEV_EVENT_EOF) {
         std::cout << "connection closed" << std::endl;
     } else if (events & BEV_EVENT_ERROR) {
         std::cout << "some other error" << std::endl;
-    } else if (events & BEV_EVENT_CONNECTED) {
-        std::cout << "connected" << std::endl;
-        return;
     }
 
     bufferevent_free(bev);
 }
 
 bufferevent *connect_new(event_base *ev_base, int port) {
-    struct sockaddr_in addr;;
+    sockaddr_in addr;;
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
     addr.sin_port = htons(port);
     addr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-    struct bufferevent *bev = bufferevent_socket_new(ev_base, -1, BEV_OPT_CLOSE_ON_FREE);
+    bufferevent *bev = bufferevent_socket_new(ev_base, -1, BEV_OPT_CLOSE_ON_FREE); // | BEV_OPT_THREADSAFE);
 
-    std::cout << "before bufferevent_socket_connect, bufferevent_getfd() : " << bufferevent_getfd(bev) << std::endl;
-    if (bufferevent_socket_connect(bev, (struct sockaddr *) &addr, sizeof(addr)) < 0) {}
-    std::cout << "connected fd == bufferevent_getfd() : " << bufferevent_getfd(bev) << std::endl;
+//    std::cout << "before bufferevent_socket_connect(), bufferevent_getfd() : " << bufferevent_getfd(bev) << std::endl;
+    if (bufferevent_socket_connect(bev, (sockaddr *) &addr, sizeof(addr)) < 0) {}
+//    std::cout << " after bufferevent_socket_connect(), bufferevent_getfd() : " << bufferevent_getfd(bev) << std::endl;
 
-    bufferevent_setcb(bev, read_cb, NULL, NULL, ev_base);
+    bufferevent_setcb(bev, read_cb, NULL, error_cb, NULL);
     bufferevent_enable(bev, EV_READ | EV_PERSIST);
 
     return bev;
 }
 
 int main() {
+    event_base *base = event_base_new();
+    bufferevent *bev = connect_new(base, 8989);
+    std::cout << "connect id : " << bufferevent_getfd(bev) << std::endl;
 
-    struct event_base *ev_base = event_base_new();
+    event *write_event = event_new(base, -1, EV_READ | EV_PERSIST, write_fun, bev);
+    event_add(write_event, NULL);
 
-    bufferevent *bev = connect_new(ev_base, 8989);
-
-
-
-    std::string msg("hello");
-    int len;
-    bufferevent_write(bev, msg.data(), msg.length());
-    bufferevent_write(bev, msg.data(), msg.length());
-    bufferevent_write(bev, msg.data(), msg.length());
-    write(bufferevent_getfd(bev), msg.data(), msg.length());        // 同上，都是写入
-    write(bufferevent_getfd(bev), msg.data(), msg.length());        // 同上，都是写入
-    write(bufferevent_getfd(bev), msg.data(), msg.length());        // 同上，都是写入
-    write(bufferevent_getfd(bev), msg.data(), msg.length());        // 同上，都是写入
-
-//    event_base_loop(ev_base, EVLOOP_NONBLOCK);
-    event_base_dispatch(ev_base);
-
-
-
-    event_base_free(ev_base);
-
-
+    event_base_dispatch(base);
+    event_base_free(base);
     return 0;
 }
+
+//    std::thread ev_base_thread(
+//            [ev_base]() -> void { event_base_loop(ev_base, EVLOOP_NO_EXIT_ON_EMPTY); }
+//    );
+//    ev_base_thread.detach();
