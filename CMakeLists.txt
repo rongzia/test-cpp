@@ -5,6 +5,6 @@ message(STATUS "PROJECT_NAME : " ${PROJECT_NAME})
 
 #add_subdirectory(test-boost)
 #add_subdirectory(compare-gluster-and-gprc)
-add_subdirectory(util)
-add_subdirectory(test-grpc2)
+#add_subdirectory(util)
+#add_subdirectory(test-grpc2)
 add_subdirectory(other)
