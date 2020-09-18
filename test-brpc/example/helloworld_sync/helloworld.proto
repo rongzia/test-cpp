@@ -1,0 +1,16 @@
+syntax="proto3";
+package example;
+
+option cc_generic_services = true;
+
+message HelloworldRequest {
+      bytes message = 1;
+};
+
+message HelloworldResponse {
+      bytes message = 1;
+};
+
+service HelloworldService {
+      rpc Echo(HelloworldRequest) returns (HelloworldResponse);
+};

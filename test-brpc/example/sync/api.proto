@@ -1,0 +1,17 @@
+syntax = "proto3";
+package test_rpc;
+
+option cc_generic_services = true;
+
+service TestRpcService {
+    rpc GetItem(GetItemRequest) returns (GetItemReply) {}
+}
+
+message GetItemRequest {
+    uint64 key = 1;
+}
+
+message GetItemReply {
+    bytes item = 1;
+    uint64 item_size = 2;
+}
